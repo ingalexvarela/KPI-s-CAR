@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Seguimiento</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+:root{
+  --navy:#173b67;
+  --blue:#2f75b5;
+  --blue2:#8fb7df;
+  --light:#e9f2f9;
+  --green:#d9ead3;
+  --green-strong:#25a18e;
+  --orange:#fce4d6;
+  --gray:#f4f6f8;
+  --border:#d9e1e8;
+  --text:#1d2733;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:#eef3f7;
+  color:var(--text);
+}
+
+.app{
+  max-width:1650px;
+  margin:0 auto;
+  padding:18px;
+}
+
+.header{
+  background:var(--navy);
+  color:#fff;
+  border-radius:12px 12px 0 0;
+  padding:18px 24px;
+}
+
+.header h1{
+  margin:0;
+  font-size:24px;
+}
+
+.header p{
+  margin:5px 0 0;
+  opacity:.88;
+  font-size:14px;
+}
+
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  background:#fff;
+  border:1px solid var(--border);
+  border-top:0;
+  padding:13px 18px;
+}
+
+.btn{
+  background:var(--navy);
+  color:#fff;
+  border:0;
+  border-radius:7px;
+  padding:10px 15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.status{
+  font-size:13px;
+  color:#667788;
+}
+
+.dashboard{
+  background:#fff;
+  border:1px solid var(--border);
+  border-top:0;
+  padding:18px;
+  min-height:520px;
+}
+
+.profile{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+
+.profile h2{
+  margin:0;
+  color:var(--navy);
+  font-size:25px;
+}
+
+.profile-meta{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(150px,1fr));
+  gap:8px;
+  width:min(900px,100%);
+}
+
+.meta-box{
+  background:var(--light);
+  padding:9px 11px;
+  border-radius:8px;
+  font-size:13px;
+}
+
+.meta-box b{
+  color:var(--navy);
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-bottom:17px;
+}
+
+.card{
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px 14px;
+  background:#fff;
+}
+
+.card .label{
+  font-size:12px;
+  text-transform:uppercase;
+  color:#6b7885;
+  font-weight:800;
+}
+
+.card .value{
+  font-size:29px;
+  font-weight:800;
+  color:var(--navy);
+  margin-top:5px;
+}
+
+.progress{
+  margin-top:8px;
+  height:13px;
+  background:#e6edf3;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.progress > div{
+  height:100%;
+  width:0;
+  background:var(--green-strong);
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1150px;
+  font-size:13px;
+}
+
+thead th{
+  background:var(--blue);
+  color:#fff;
+  padding:9px 7px;
+  text-align:center;
+}
+
+td{
+  padding:6px 7px;
+  border-bottom:1px solid #e8edf2;
+  vertical-align:middle;
+}
+
+th:nth-child(1){width:45px}
+th:nth-child(2){width:22%}
+th:nth-child(3){width:34%}
+th:nth-child(4){width:22%}
+th:nth-child(5){width:72px}
+th:nth-child(6){width:62px}
+th:nth-child(7){width:auto}
+
+.section-row td{
+  background:var(--blue2);
+  color:#fff;
+  font-weight:800;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.ok{
+  background:var(--green);
+}
+
+.pending{
+  background:var(--orange);
+}
+
+.center{
+  text-align:center;
+}
+
+.bold{
+  font-weight:700;
+}
+
+.nav-bottom{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:9px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-top:0;
+  padding:15px 18px 18px;
+  border-radius:0 0 12px 12px;
+}
+
+.role-btn{
+  border:1px solid #b9c8d6;
+  background:#f7fafc;
+  color:#294d73;
+  border-radius:8px;
+  padding:12px 8px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.role-btn.active{
+  background:var(--navy);
+  color:#fff;
+  border-color:var(--navy);
+}
+
+.placeholder{
+  padding:80px 20px;
+  text-align:center;
+  color:#73808b;
+}
+
+.error{
+  padding:40px 20px;
+  text-align:center;
+  color:#8a2f2f;
+}
+
+@media(max-width:1100px){
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .profile-meta{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .nav-bottom{
+    grid-template-columns:repeat(4,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <h1>DASHBOARD DE SEGUIMIENTO DE FUNCIONES</h1>
+    <p>Ingeniería Eléctrica · Seguimiento mensual por puesto</p>
+  </div>
+
+  <div class="toolbar">
+
+    <label class="btn">
+      Probar Excel local
+      <input
+        id="excelInput"
+        type="file"
+        accept=".xlsx,.xls,.xlsm"
+        hidden
+      >
+    </label>
+
+    <span class="status" id="status">
+      Cargando datos del Asistente...
+    </span>
+
+  </div>
+
+  <main class="dashboard" id="dashboard">
+
+    <div class="placeholder">
+      Cargando información...
+    </div>
+
+  </main>
+
+  <nav class="nav-bottom">
+
+    <button class="role-btn" data-role="analista">
+      Analista
+    </button>
+
+    <button class="role-btn active" data-role="asistente">
+      Asistente
+    </button>
+
+    <button class="role-btn" data-role="proyectos">
+      Proyectos
+    </button>
+
+    <button class="role-btn" data-role="coordinador">
+      Coordinador
+    </button>
+
+    <button class="role-btn" data-role="jefatura">
+      Jefatura
+    </button>
+
+    <button class="role-btn" data-role="gis">
+      GIS
+    </button>
+
+    <button class="role-btn" data-role="facturacion">
+      Facturación
+    </button>
+
+  </nav>
+
+</div>
+
+<script>
+
+const dashboard = document.getElementById("dashboard");
+const status = document.getElementById("status");
+const input = document.getElementById("excelInput");
+
+let currentRole = "asistente";
+
+/* =====================================================
+   ARCHIVOS DE CADA DASHBOARD
+   ===================================================== */
+
+const FILES = {
+  analista: "datos/analista.xlsx",
+  asistente: "datos/asistente.xlsx",
+  proyectos: "datos/proyectos.xlsx",
+  coordinador: "datos/coordinador.xlsx",
+  jefatura: "datos/jefatura.xlsx",
+  gis: "datos/gis.xlsx",
+  facturacion: "datos/facturacion.xlsx"
+};
+
+
+/* =====================================================
+   BOTONES INFERIORES
+   ===================================================== */
+
+document.querySelectorAll(".role-btn").forEach(btn => {
+
+  btn.addEventListener("click", async () => {
+
+    document
+      .querySelectorAll(".role-btn")
+      .forEach(x => x.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    currentRole = btn.dataset.role;
+
+    if(currentRole === "asistente"){
+
+      await loadRemoteExcel(
+        FILES.asistente,
+        "Asistente"
+      );
+
+    }else{
+
+      dashboard.innerHTML = `
+        <div class="placeholder">
+          Dashboard de
+          <b>${btn.textContent}</b>
+          pendiente de configurar.
+        </div>
+      `;
+
+      status.textContent =
+        `Dashboard de ${btn.textContent} aún no configurado.`;
+    }
+
+  });
+
+});
+
+
+/* =====================================================
+   CARGAR EXCEL AUTOMÁTICAMENTE DESDE GITHUB
+   ===================================================== */
+
+async function loadRemoteExcel(url, roleName){
+
+  try{
+
+    dashboard.innerHTML = `
+      <div class="placeholder">
+        Cargando datos de ${roleName}...
+      </div>
+    `;
+
+    status.textContent =
+      `Leyendo ${url} ...`;
+
+    /*
+      Evita que el navegador mantenga en caché
+      el Excel anterior.
+    */
+
+    const response = await fetch(
+      url + "?v=" + Date.now()
+    );
+
+    if(!response.ok){
+
+      throw new Error(
+        "No se pudo encontrar el archivo."
+      );
+
+    }
+
+    const arrayBuffer =
+      await response.arrayBuffer();
+
+    const workbook = XLSX.read(
+      arrayBuffer,
+      {
+        type:"array",
+        cellDates:true
+      }
+    );
+
+    processWorkbook(
+      workbook,
+      roleName,
+      url
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    dashboard.innerHTML = `
+      <div class="error">
+
+        <h3>No se pudo cargar el Excel</h3>
+
+        <p>
+          Archivo esperado:
+          <b>${url}</b>
+        </p>
+
+        <p>
+          Verifique que el archivo exista
+          en el repositorio de GitHub.
+        </p>
+
+      </div>
+    `;
+
+    status.textContent =
+      "No se pudo cargar el archivo automáticamente.";
+  }
+
+}
+
+
+/* =====================================================
+   BOTÓN PARA PROBAR UN EXCEL LOCAL
+   ===================================================== */
+
+input.addEventListener(
+  "change",
+  async e => {
+
+    const file = e.target.files[0];
+
+    if(!file){
+      return;
+    }
+
+    try{
+
+      const arrayBuffer =
+        await file.arrayBuffer();
+
+      const workbook = XLSX.read(
+        arrayBuffer,
+        {
+          type:"array",
+          cellDates:true
+        }
+      );
+
+      processWorkbook(
+        workbook,
+        "Asistente",
+        file.name
+      );
+
+      status.textContent =
+        `Archivo de prueba: ${file.name}`;
+
+    }catch(error){
+
+      console.error(error);
+
+      dashboard.innerHTML = `
+        <div class="error">
+          No se pudo leer el Excel seleccionado.
+        </div>
+      `;
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   PROCESAR LIBRO
+   ===================================================== */
+
+function processWorkbook(
+  workbook,
+  roleName,
+  sourceName
+){
+
+  const sheetName =
+    workbook.SheetNames.find(
+      name =>
+        normalize(name) === "SEGUIMIENTO"
+    );
+
+  if(!sheetName){
+
+    dashboard.innerHTML = `
+      <div class="error">
+
+        No se encontró una hoja llamada
+        <b>Seguimiento</b>.
+
+      </div>
+    `;
+
+    status.textContent =
+      "El Excel no contiene la hoja Seguimiento.";
+
+    return;
+
+  }
+
+  const worksheet =
+    workbook.Sheets[sheetName];
+
+  const rows =
+    XLSX.utils.sheet_to_json(
+      worksheet,
+      {
+        header:1,
+        raw:true,
+        defval:""
+      }
+    );
+
+  const data =
+    parseSeguimiento(rows);
+
+  renderDashboard(
+    data,
+    roleName,
+    sourceName
+  );
+
+}
+
+
+/* =====================================================
+   LEER HOJA SEGUIMIENTO
+   ===================================================== */
+
+function parseSeguimiento(rows){
+
+  const data = {
+
+    mes:
+      monthName(
+        rows[2]?.[1]
+      ),
+
+    fecha:
+      formatDate(
+        rows[3]?.[1]
+      ),
+
+    responsable:
+      rows[2]?.[4] || "",
+
+    jefatura:
+      rows[3]?.[4] || "",
+
+    items:[]
+  };
+
+
+  let section = "";
+
+
+  for(
+    let r = 5;
+    r < rows.length;
+    r++
+  ){
+
+    const row = rows[r];
+
+    const first = row?.[0];
+
+
+    /*
+      termina al llegar
+      al resumen mensual
+    */
+
+    if(
+      normalize(first) ===
+      "CUMPLIMIENTO GENERAL MENSUAL"
+    ){
+
+      break;
+
+    }
+
+
+    /*
+      Detectar encabezados
+      de sección
+    */
+
+    if(
+      typeof first === "string" &&
+      first &&
+      !/^\d+$/.test(first.trim())
+    ){
+
+      section = first.trim();
+
+      continue;
+
+    }
+
+
+    /*
+      Filas numeradas
+    */
+
+    if(
+      typeof first === "number" ||
+      /^\d+$/.test(String(first))
+    ){
+
+      data.items.push({
+
+        n:first,
+
+        aspecto:
+          row[1] || "",
+
+        indicador:
+          row[2] || "",
+
+        meta:
+          row[3] || "",
+
+        cumplido:
+          checked(row[4]),
+
+        na:
+          checked(row[5]),
+
+        obs:
+          row[6] || "",
+
+        section
+
+      });
+
+    }
+
+  }
+
+
+  return data;
+
+}
+
+
+/* =====================================================
+   CALCULAR Y MOSTRAR DASHBOARD
+   ===================================================== */
+
+function renderDashboard(
+  data,
+  roleName,
+  sourceName
+){
+
+  const aplica =
+    data.items.filter(
+      x => !x.na
+    );
+
+
+  const cumplidas =
+    aplica.filter(
+      x => x.cumplido
+    ).length;
+
+
+  const pendientes =
+    aplica.filter(
+      x => !x.cumplido
+    ).length;
+
+
+  const na =
+    data.items.filter(
+      x => x.na
+    ).length;
+
+
+  const total =
+    data.items.length;
+
+
+  const pct =
+    aplica.length
+      ? Math.round(
+          cumplidas /
+          aplica.length *
+          100
+        )
+      : 0;
+
+
+  let rowsHtml = "";
+
+  let lastSection = null;
+
+
+  for(const item of data.items){
+
+    if(
+      item.section &&
+      item.section !== lastSection
+    ){
+
+      lastSection =
+        item.section;
+
+      rowsHtml += `
+
+        <tr class="section-row">
+
+          <td colspan="7">
+
+            ${escapeHtml(lastSection)}
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+
+
+    rowsHtml += `
+
+      <tr class="${
+        item.cumplido
+          ? "ok"
+          : "pending"
+      }">
+
+        <td class="center bold">
+          ${item.n}
+        </td>
+
+        <td class="bold">
+          ${escapeHtml(item.aspecto)}
+        </td>
+
+        <td>
+          ${escapeHtml(item.indicador)}
+        </td>
+
+        <td>
+          ${escapeHtml(item.meta)}
+        </td>
+
+        <td class="center">
+          ${
+            item.cumplido
+              ? "☑"
+              : "☐"
+          }
+        </td>
+
+        <td class="center">
+          ${
+            item.na
+              ? "☑"
+              : "☐"
+          }
+        </td>
+
+        <td>
+          ${escapeHtml(item.obs)}
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+
+  dashboard.innerHTML = `
+
+    <div class="profile">
+
+      <div>
+
+        <h2>
+          ${roleName}
+        </h2>
+
+        <div
+          style="
+          font-size:13px;
+          color:#6d7985;
+          margin-top:4px;
+          "
+        >
+
+          ${escapeHtml(sourceName)}
+
+        </div>
+
+      </div>
+
+
+      <div class="profile-meta">
+
+        <div class="meta-box">
+
+          <b>Mes:</b>
+
+          ${escapeHtml(data.mes)}
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <b>Fecha:</b>
+
+          ${escapeHtml(data.fecha)}
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <b>Responsable:</b>
+
+          ${escapeHtml(
+            data.responsable
+          )}
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <b>Jefatura:</b>
+
+          ${escapeHtml(
+            data.jefatura
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="cards">
+
+      <div class="card">
+
+        <div class="label">
+          Total funciones
+        </div>
+
+        <div class="value">
+          ${total}
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="label">
+          Cumplidas
+        </div>
+
+        <div class="value">
+          ${cumplidas}
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="label">
+          Pendientes
+        </div>
+
+        <div class="value">
+          ${pendientes}
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="label">
+          No aplica
+        </div>
+
+        <div class="value">
+          ${na}
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="label">
+          Cumplimiento
+        </div>
+
+        <div class="value">
+          ${pct}%
+        </div>
+
+        <div class="progress">
+
+          <div
+            style="
+            width:${pct}%
+            "
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>N.°</th>
+
+            <th>
+              Aspecto de seguimiento
+            </th>
+
+            <th>
+              Indicador / criterio mensual
+            </th>
+
+            <th>
+              Meta
+            </th>
+
+            <th>
+              Cumplido
+            </th>
+
+            <th>
+              N/A
+            </th>
+
+            <th>
+              Observaciones / pendientes
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${rowsHtml}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =====================================================
+   FUNCIONES AUXILIARES
+   ===================================================== */
+
+function normalize(value){
+
+  return String(
+    value ?? ""
+  )
+  .normalize("NFD")
+  .replace(
+    /[\u0300-\u036f]/g,
+    ""
+  )
+  .toUpperCase()
+  .trim();
+
+}
+
+
+function checked(value){
+
+  if(
+    value === true ||
+    value === 1
+  ){
+
+    return true;
+
+  }
+
+
+  const text =
+    normalize(value);
+
+
+  return [
+
+    "TRUE",
+    "VERDADERO",
+    "SI",
+    "SÍ",
+    "X",
+    "1",
+    "OK",
+    "CUMPLIDO",
+    "☑",
+    "✓",
+    "✔"
+
+  ].includes(text);
+
+}
+
+
+function formatDate(value){
+
+  if(
+    value instanceof Date &&
+    !isNaN(value)
+  ){
+
+    return new Intl.DateTimeFormat(
+      "es-CR",
+      {
+        day:"2-digit",
+        month:"short",
+        year:"numeric"
+      }
+    ).format(value);
+
+  }
+
+
+  if(
+    typeof value === "number"
+  ){
+
+    const d =
+      XLSX.SSF.parse_date_code(
+        value
+      );
+
+
+    if(d){
+
+      return (
+        String(d.d).padStart(2,"0")
+        + "/"
+        + String(d.m).padStart(2,"0")
+        + "/"
+        + d.y
+      );
+
+    }
+
+  }
+
+
+  return String(
+    value || ""
+  );
+
+}
+
+
+function monthName(value){
+
+  let date = value;
+
+
+  if(
+    typeof value === "number"
+  ){
+
+    const d =
+      XLSX.SSF.parse_date_code(
+        value
+      );
+
+
+    if(d){
+
+      date =
+        new Date(
+          d.y,
+          d.m - 1,
+          d.d
+        );
+
+    }
+
+  }
+
+
+  if(
+    date instanceof Date &&
+    !isNaN(date)
+  ){
+
+    return new Intl.DateTimeFormat(
+      "es-CR",
+      {
+        month:"long",
+        year:"numeric"
+      }
+    ).format(date);
+
+  }
+
+
+  return String(
+    value || ""
+  );
+
+}
+
+
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  )
+  .replaceAll(
+    "&",
+    "&amp;"
+  )
+  .replaceAll(
+    "<",
+    "&lt;"
+  )
+  .replaceAll(
+    ">",
+    "&gt;"
+  )
+  .replaceAll(
+    '"',
+    "&quot;"
+  )
+  .replaceAll(
+    "'",
+    "&#039;"
+  );
+
+}
+
+
+/* =====================================================
+   INICIO AUTOMÁTICO
+   ===================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    await loadRemoteExcel(
+      FILES.asistente,
+      "Asistente"
+    );
+
+  }
+);
+
+</script>
+
+</body>
+</html>
