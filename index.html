@@ -367,7 +367,6 @@ const FILES = {
   facturacion: "datos/facturacion.xlsx"
 };
 
-
 /* =====================================================
    BOTONES INFERIORES
    ===================================================== */
@@ -376,39 +375,54 @@ document.querySelectorAll(".role-btn").forEach(btn => {
 
   btn.addEventListener("click", async () => {
 
-    document
-      .querySelectorAll(".role-btn")
+    document.querySelectorAll(".role-btn")
       .forEach(x => x.classList.remove("active"));
 
     btn.classList.add("active");
 
     currentRole = btn.dataset.role;
 
-    if(currentRole === "asistente"){
+    const roleNames = {
+      analista: "Analista",
+      asistente: "Asistente",
+      proyectos: "Proyectos",
+      coordinador: "Coordinador",
+      jefatura: "Jefatura",
+      gis: "GIS",
+      facturacion: "Facturación"
+    };
+
+    // Dashboards habilitados
+    const enabledRoles = [
+      "asistente",
+      "coordinador"
+    ];
+
+    if(enabledRoles.includes(currentRole)) {
 
       await loadRemoteExcel(
-        FILES.asistente,
-        "Asistente"
+        FILES[currentRole],
+        roleNames[currentRole]
       );
 
-    }else{
+    } else {
 
       dashboard.innerHTML = `
         <div class="placeholder">
           Dashboard de
-          <b>${btn.textContent}</b>
+          <b>${roleNames[currentRole]}</b>
           pendiente de configurar.
         </div>
       `;
 
       status.textContent =
-        `Dashboard de ${btn.textContent} aún no configurado.`;
+        `Dashboard de ${roleNames[currentRole]} aún no configurado.`;
+
     }
 
   });
 
 });
-
 
 /* =====================================================
    CARGAR EXCEL AUTOMÁTICAMENTE DESDE GITHUB
