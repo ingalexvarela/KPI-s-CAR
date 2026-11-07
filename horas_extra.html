@@ -1,0 +1,748 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Horas Extra | Ingeniería Eléctrica</title><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script><style>
+:root{
+  --navy:#173b67;
+  --blue:#2f75b5;
+  --blue2:#8fb7df;
+  --light:#e9f2f9;
+  --green:#d9ead3;
+  --green-strong:#25a18e;
+  --orange:#fce4d6;
+  --gray:#f4f6f8;
+  --border:#d9e1e8;
+  --text:#1d2733;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:#eef3f7;
+  color:var(--text);
+}
+
+.app{
+  max-width:1650px;
+  margin:0 auto;
+  padding:18px;
+}
+
+.header{
+  background:var(--navy);
+  color:#fff;
+  border-radius:12px 12px 0 0;
+  padding:18px 24px;
+}
+
+.header h1{
+  margin:0;
+  font-size:24px;
+}
+
+.header p{
+  margin:5px 0 0;
+  opacity:.88;
+  font-size:14px;
+}
+
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  background:#fff;
+  border:1px solid var(--border);
+  border-top:0;
+  padding:13px 18px;
+}
+
+.btn{
+  background:var(--navy);
+  color:#fff;
+  border:0;
+  border-radius:7px;
+  padding:10px 15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.status{
+  font-size:13px;
+  color:#667788;
+}
+
+.dashboard{
+  background:#fff;
+  border:1px solid var(--border);
+  border-top:0;
+  padding:18px;
+  min-height:520px;
+}
+
+.profile{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+
+.profile h2{
+  margin:0;
+  color:var(--navy);
+  font-size:25px;
+}
+
+.profile-meta{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(150px,1fr));
+  gap:8px;
+  width:min(900px,100%);
+}
+
+.meta-box{
+  background:var(--light);
+  padding:9px 11px;
+  border-radius:8px;
+  font-size:13px;
+}
+
+.meta-box b{
+  color:var(--navy);
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-bottom:17px;
+}
+
+.card{
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px 14px;
+  background:#fff;
+}
+
+.card .label{
+  font-size:12px;
+  text-transform:uppercase;
+  color:#6b7885;
+  font-weight:800;
+}
+
+.card .value{
+  font-size:29px;
+  font-weight:800;
+  color:var(--navy);
+  margin-top:5px;
+}
+
+.progress{
+  margin-top:8px;
+  height:13px;
+  background:#e6edf3;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.progress > div{
+  height:100%;
+  width:0;
+  background:var(--green-strong);
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1150px;
+  font-size:13px;
+}
+
+thead th{
+  background:var(--blue);
+  color:#fff;
+  padding:9px 7px;
+  text-align:center;
+}
+
+td{
+  padding:6px 7px;
+  border-bottom:1px solid #e8edf2;
+  vertical-align:middle;
+}
+
+th:nth-child(1){width:45px}
+th:nth-child(2){width:22%}
+th:nth-child(3){width:34%}
+th:nth-child(4){width:22%}
+th:nth-child(5){width:72px}
+th:nth-child(6){width:62px}
+th:nth-child(7){width:auto}
+
+.section-row td{
+  background:var(--blue2);
+  color:#fff;
+  font-weight:800;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.ok{
+  background:var(--green);
+}
+
+.pending{
+  background:var(--orange);
+}
+
+.center{
+  text-align:center;
+}
+
+.bold{
+  font-weight:700;
+}
+
+.nav-bottom{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:9px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-top:0;
+  padding:15px 18px 18px;
+  border-radius:0 0 12px 12px;
+}
+
+.role-btn{
+  border:1px solid #b9c8d6;
+  background:#f7fafc;
+  color:#294d73;
+  border-radius:8px;
+  padding:12px 8px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.role-btn.active{
+  background:var(--navy);
+  color:#fff;
+  border-color:var(--navy);
+}
+
+.placeholder{
+  padding:80px 20px;
+  text-align:center;
+  color:#73808b;
+}
+
+.error{
+  padding:40px 20px;
+  text-align:center;
+  color:#8a2f2f;
+}
+
+@media(max-width:1100px){
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .profile-meta{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .nav-bottom{
+    grid-template-columns:repeat(4,1fr);
+  }
+}
+
+/* Horas Extra */
+.hours-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin:16px 0 20px}
+.hours-filters label{display:grid;gap:5px;font-size:12px;font-weight:700;color:var(--navy)}
+.hours-filters select{padding:10px;border:1px solid var(--border);border-radius:7px;background:white;min-width:150px}
+.hours-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.hours-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.hours-panel{border:1px solid var(--border);border-radius:12px;padding:16px;min-width:0}
+.hours-panel h3{margin:0 0 12px;color:var(--navy);font-size:16px}
+.hours-chart{height:300px;position:relative}
+.hours-note{font-size:12px;color:#697989;margin:8px 0 16px}
+.hours-table{min-width:750px}
+.hours-table th:nth-child(n){width:auto}
+.hours-table td:nth-child(n+2){text-align:right}
+.hours-table tbody tr:hover{background:#f1f6fa}
+@media(max-width:850px){.hours-grid{grid-template-columns:repeat(2,1fr)}.hours-panels{grid-template-columns:1fr}}
+@media(max-width:480px){.hours-grid{grid-template-columns:1fr}}
+</style></head><body><div class="app"><header class="header"><h1>HORAS EXTRA · CONTROL ANUAL</h1><p>COOPEALFARORUIZ · Departamento de Ingeniería Eléctrica</p></header><div class="toolbar"><label class="btn">Cargar Excel local<input id="excelInput" type="file" accept=".xlsx,.xls,.xlsm" hidden></label><button class="btn" id="reload" type="button">Actualizar desde GitHub</button><span class="status" id="status">Cargando datos...</span></div><main class="dashboard" id="dashboard"><div class="placeholder">Cargando información...</div></main></div><script>
+const dashboard=document.getElementById('dashboard');const status=document.getElementById('status');
+function normalize(value){
+
+  return String(
+    value ?? ""
+  )
+  .normalize("NFD")
+  .replace(
+    /[\u0300-\u036f]/g,
+    ""
+  )
+  .toUpperCase()
+  .trim();
+
+}
+
+
+function checked(value){
+
+  if(
+    value === true ||
+    value === 1
+  ){
+
+    return true;
+
+  }
+
+
+  const text =
+    normalize(value);
+
+
+  return [
+
+    "TRUE",
+    "VERDADERO",
+    "SI",
+    "SÍ",
+    "X",
+    "1",
+    "OK",
+    "CUMPLIDO",
+    "☑",
+    "✓",
+    "✔"
+
+  ].includes(text);
+
+}
+
+
+function formatDate(value){
+
+  if(
+    value instanceof Date &&
+    !isNaN(value)
+  ){
+
+    return new Intl.DateTimeFormat(
+      "es-CR",
+      {
+        day:"2-digit",
+        month:"short",
+        year:"numeric"
+      }
+    ).format(value);
+
+  }
+
+
+  if(
+    typeof value === "number"
+  ){
+
+    const d =
+      XLSX.SSF.parse_date_code(
+        value
+      );
+
+
+    if(d){
+
+      return (
+        String(d.d).padStart(2,"0")
+        + "/"
+        + String(d.m).padStart(2,"0")
+        + "/"
+        + d.y
+      );
+
+    }
+
+  }
+
+
+  return String(
+    value || ""
+  );
+
+}
+
+
+function monthName(value){
+
+  let date = value;
+
+
+  if(
+    typeof value === "number"
+  ){
+
+    const d =
+      XLSX.SSF.parse_date_code(
+        value
+      );
+
+
+    if(d){
+
+      date =
+        new Date(
+          d.y,
+          d.m - 1,
+          d.d
+        );
+
+    }
+
+  }
+
+
+  if(
+    date instanceof Date &&
+    !isNaN(date)
+  ){
+
+    return new Intl.DateTimeFormat(
+      "es-CR",
+      {
+        month:"long",
+        year:"numeric"
+      }
+    ).format(date);
+
+  }
+
+
+  return String(
+    value || ""
+  );
+
+}
+
+
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  )
+  .replaceAll(
+    "&",
+    "&amp;"
+  )
+  .replaceAll(
+    "<",
+    "&lt;"
+  )
+  .replaceAll(
+    ">",
+    "&gt;"
+  )
+  .replaceAll(
+    '"',
+    "&quot;"
+  )
+  .replaceAll(
+    "'",
+    "&#039;"
+  );
+
+}
+
+
+/* =====================================================
+   INICIO AUTOMÁTICO
+   ===================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    await loadRemoteExcel(
+      FILES.asistente,
+      "Asistente"
+    );
+
+  }
+);
+
+
+/* ================= HORAS EXTRA ================= */
+let hoursRecords = [];
+let hoursSource = '';
+let hoursCharts = [];
+const HOURS_MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function hoursNum(v){
+  if(typeof v==='number') return Number.isFinite(v)?v:0;
+  if(typeof v==='string'){
+    const t=v.trim().replace(/\s/g,'');
+    if(!t) return 0;
+    const n=Number(t.includes(',')?t.replace(/\./g,'').replace(',','.'):t);
+    return Number.isFinite(n)?n:0;
+  }
+  return 0;
+}
+function parseHoursWorkbook(workbook){
+  const sheet=workbook.Sheets[workbook.SheetNames[0]];
+  if(!sheet) throw new Error('El archivo no contiene hojas');
+  const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:true});
+  const headers=rows[0]||[];
+  const cols=[];
+  headers.forEach((v,i)=>{
+    const m=normalize(v).toLowerCase().match(/^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2})$/);
+    if(m) cols.push({i,month:HOURS_MONTHS.indexOf(m[1])+1,year:Number(m[2])});
+  });
+  if(!cols.length) throw new Error('No se encontraron columnas con formato «enero 2025», «febrero 2025», etc.');
+  let type=null;
+  const result=[];
+  rows.slice(1).forEach(row=>{
+    const name=String(row[0]??'').trim();
+    const norm=normalize(name);
+    if(norm.includes('HORAS EXTRA REGULAR')){type='Regular';return;}
+    if(norm.includes('HORA EXTRA DOBLE')){type='Doble';return;}
+    if(!name||norm.includes('INGENIERIA ELECTRICA')||!type)return;
+    cols.forEach(c=>{
+      const raw=row[c.i];
+      if(raw===''||raw===null||raw===undefined)return;
+      const value=hoursNum(raw);
+      if(value<0)return;
+      result.push({name,type,year:c.year,month:c.month,hours:value});
+    });
+  });
+  if(!result.length)throw new Error('No se encontraron registros por colaborador');
+  return result;
+}
+async function loadHoursRemote(){
+  const url=FILES.horasextra;
+  dashboard.innerHTML='<div class="placeholder">Cargando horas extra...</div>';
+  status.textContent='Leyendo '+url;
+  try{
+    const response=await fetch(url+'?v='+Date.now(),{cache:'no-store'});
+    if(!response.ok)throw new Error('No se encontró '+url+' (HTTP '+response.status+')');
+    const wb=XLSX.read(await response.arrayBuffer(),{type:'array',cellDates:true});
+    processHoursWorkbook(wb,url);
+  }catch(e){
+    dashboard.innerHTML='<div class="error"><h3>No se pudo cargar Horas Extra</h3><p>'+escapeHtml(e.message)+'</p><p>Suba el Excel como <b>datos/horas_extra.xlsx</b> o utilice «Probar Excel local».</p></div>';
+    status.textContent='Horas Extra: archivo no disponible';
+  }
+}
+function processHoursWorkbook(wb,source){
+  try{
+    hoursRecords=parseHoursWorkbook(wb);
+    hoursSource=source;
+    renderHours();
+    status.textContent='Horas Extra: '+source+' · '+hoursRecords.length+' registros';
+  }catch(e){
+    dashboard.innerHTML='<div class="error">'+escapeHtml(e.message)+'</div>';
+    status.textContent='Error en el formato de horas extra';
+  }
+}
+const hoursFmt=n=>n.toLocaleString('es-CR',{minimumFractionDigits:1,maximumFractionDigits:1});
+function renderHours(){
+  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
+  const years=[...new Set(hoursRecords.map(x=>x.year))].sort((a,b)=>b-a);
+  dashboard.innerHTML=`
+    <div class="profile"><div><h2>Control anual de horas extra</h2><div class="hours-note">Fuente: ${escapeHtml(hoursSource)} · Valores en horas decimales</div></div></div>
+    <div class="hours-filters">
+      <label>Año<select id="hoursYear"><option value="all">Todos</option>${years.map(y=>`<option value="${y}" ${y===years[0]?'selected':''}>${y}</option>`).join('')}</select></label>
+      <label>Mes<select id="hoursMonth"><option value="all">Todos los meses</option>${HOURS_MONTHS.map((m,i)=>`<option value="${i+1}">${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}</select></label>
+      <label>Tipo<select id="hoursType"><option value="all">Todas</option><option value="Regular">Regular</option><option value="Doble">Doble</option></select></label>
+      <label>Colaborador<select id="hoursPerson"><option value="all">Todos</option>${[...new Set(hoursRecords.map(x=>x.name))].sort((a,b)=>a.localeCompare(b,'es')).map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('')}</select></label>
+      <button class="btn" id="hoursExport" type="button">Exportar CSV filtrado</button>
+    </div>
+    <div class="hours-grid" id="hoursKpis"></div>
+    <div class="hours-panels"><section class="hours-panel"><h3>Evolución mensual</h3><div class="hours-chart"><canvas id="hoursMonthly"></canvas></div></section><section class="hours-panel"><h3>Horas por tipo</h3><div class="hours-chart"><canvas id="hoursTypes"></canvas></div></section></div>
+    <div class="hours-panels"><section class="hours-panel"><h3>Colaboradores con más horas</h3><div class="hours-chart"><canvas id="hoursPeople"></canvas></div></section><section class="hours-panel"><h3>Comparación anual</h3><div class="hours-chart"><canvas id="hoursYears"></canvas></div></section></div>
+    <section class="hours-panel"><h3>Detalle por colaborador</h3><div class="table-wrap"><table class="hours-table"><thead><tr><th>Colaborador</th><th>Regular (h)</th><th>Doble (h)</th><th>Total (h)</th><th>Participación</th></tr></thead><tbody id="hoursRows"></tbody></table></div></section>
+    <p class="hours-note">Las horas regulares y dobles se suman como horas efectivamente registradas, sin multiplicar las dobles por dos. Los meses sin datos no se consideran registros reportados.</p>`;
+  ['hoursYear','hoursMonth','hoursType','hoursPerson'].forEach(id=>document.getElementById(id).addEventListener('change',updateHours));
+  document.getElementById('hoursExport').addEventListener('click',()=>{
+    const data=filteredHours();
+    const csv=['Colaborador;Año;Mes;Tipo;Horas',...data.map(x=>[x.name,x.year,HOURS_MONTHS[x.month-1],x.type,x.hours.toFixed(4).replace('.',',')].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';'))].join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='horas_extra_filtradas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  });
+  updateHours();
+}
+function filteredHours(){
+  const y=document.getElementById('hoursYear').value,m=document.getElementById('hoursMonth').value,t=document.getElementById('hoursType').value,p=document.getElementById('hoursPerson').value;
+  return hoursRecords.filter(x=>(y==='all'||x.year===+y)&&(m==='all'||x.month===+m)&&(t==='all'||x.type===t)&&(p==='all'||x.name===p));
+}
+function hoursChart(id,type,labels,datasets,options={}){
+  if(typeof Chart==='undefined')return;
+  const chart=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},...options}});
+  hoursCharts.push(chart);
+}
+function updateHours(){
+  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
+  const data=filteredHours(),sum=arr=>arr.reduce((a,x)=>a+x.hours,0);
+  const total=sum(data),regular=sum(data.filter(x=>x.type==='Regular')),double=sum(data.filter(x=>x.type==='Doble'));
+  const persons=new Set(data.filter(x=>x.hours>0).map(x=>x.name)).size;
+  const cards=[['Total horas',total,'h'],['Horas regulares',regular,'h'],['Horas dobles',double,'h'],['Colaboradores con horas',persons,'']];
+  document.getElementById('hoursKpis').innerHTML=cards.map(([label,n,unit])=>`<div class="card"><div class="label">${label}</div><div class="value">${unit?hoursFmt(n):n}${unit?' <small style="font-size:14px">h</small>':''}</div></div>`).join('');
+  const y=document.getElementById('hoursYear').value;
+  const months=y==='all'?[...new Set(data.map(x=>x.year+'-'+String(x.month).padStart(2,'0')))].sort():Array.from({length:12},(_,i)=>y+'-'+String(i+1).padStart(2,'0'));
+  const monthLabels=months.map(k=>{const [yr,mo]=k.split('-');return HOURS_MONTHS[+mo-1].slice(0,3)+' '+yr;});
+  hoursChart('hoursMonthly','bar',monthLabels,['Regular','Doble'].map((t,i)=>({label:t,data:months.map(k=>sum(data.filter(x=>x.type===t&&x.year+'-'+String(x.month).padStart(2,'0')===k))),backgroundColor:i?'#f3a65c':'#2f75b5'})),{scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}});
+  hoursChart('hoursTypes','doughnut',['Regular','Doble'],[{data:[regular,double],backgroundColor:['#2f75b5','#f3a65c']}]);
+  const byPerson=new Map();data.forEach(x=>byPerson.set(x.name,(byPerson.get(x.name)||0)+x.hours));
+  const top=[...byPerson].sort((a,b)=>b[1]-a[1]).slice(0,10);
+  hoursChart('hoursPeople','bar',top.map(x=>x[0]),[{label:'Horas',data:top.map(x=>x[1]),backgroundColor:'#25a18e'}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}});
+  const years=[...new Set(hoursRecords.map(x=>x.year))].sort();
+  hoursChart('hoursYears','bar',years.map(String),[{label:'Horas registradas',data:years.map(yr=>sum(data.filter(x=>x.year===yr))),backgroundColor:'#173b67'}],{scales:{y:{beginAtZero:true}}});
+  const names=[...new Set(data.map(x=>x.name))];
+  const table=names.map(name=>{const entries=data.filter(x=>x.name===name),r=sum(entries.filter(x=>x.type==='Regular')),d=sum(entries.filter(x=>x.type==='Doble'));return{name,r,d,total:r+d};}).sort((a,b)=>b.total-a.total);
+  document.getElementById('hoursRows').innerHTML=table.length?table.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${hoursFmt(x.r)}</td><td>${hoursFmt(x.d)}</td><td><b>${hoursFmt(x.total)}</b></td><td>${total?(x.total/total*100).toFixed(1):'0,0'}%</td></tr>`).join(''):'<tr><td colspan="5">No hay registros para los filtros seleccionados.</td></tr>';
+}
+
+</script>
+
+</body>
+</html>
+/* ================= HORAS EXTRA ================= */
+let hoursRecords = [];
+let hoursSource = '';
+let hoursCharts = [];
+const HOURS_MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function hoursNum(v){
+  if(typeof v==='number') return Number.isFinite(v)?v:0;
+  if(typeof v==='string'){
+    const t=v.trim().replace(/\s/g,'');
+    if(!t) return 0;
+    const n=Number(t.includes(',')?t.replace(/\./g,'').replace(',','.'):t);
+    return Number.isFinite(n)?n:0;
+  }
+  return 0;
+}
+function parseHoursWorkbook(workbook){
+  const sheet=workbook.Sheets[workbook.SheetNames[0]];
+  if(!sheet) throw new Error('El archivo no contiene hojas');
+  const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:true});
+  const headers=rows[0]||[];
+  const cols=[];
+  headers.forEach((v,i)=>{
+    const m=normalize(v).toLowerCase().match(/^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2})$/);
+    if(m) cols.push({i,month:HOURS_MONTHS.indexOf(m[1])+1,year:Number(m[2])});
+  });
+  if(!cols.length) throw new Error('No se encontraron columnas con formato «enero 2025», «febrero 2025», etc.');
+  let type=null;
+  const result=[];
+  rows.slice(1).forEach(row=>{
+    const name=String(row[0]??'').trim();
+    const norm=normalize(name);
+    if(norm.includes('HORAS EXTRA REGULAR')){type='Regular';return;}
+    if(norm.includes('HORA EXTRA DOBLE')){type='Doble';return;}
+    if(!name||norm.includes('INGENIERIA ELECTRICA')||!type)return;
+    cols.forEach(c=>{
+      const raw=row[c.i];
+      if(raw===''||raw===null||raw===undefined)return;
+      const value=hoursNum(raw);
+      if(value<0)return;
+      result.push({name,type,year:c.year,month:c.month,hours:value});
+    });
+  });
+  if(!result.length)throw new Error('No se encontraron registros por colaborador');
+  return result;
+}
+async function loadHoursRemote(){
+  const url='datos/horas_extra.xlsx';
+  dashboard.innerHTML='<div class="placeholder">Cargando horas extra...</div>';
+  status.textContent='Leyendo '+url;
+  try{
+    const response=await fetch(url+'?v='+Date.now(),{cache:'no-store'});
+    if(!response.ok)throw new Error('No se encontró '+url+' (HTTP '+response.status+')');
+    const wb=XLSX.read(await response.arrayBuffer(),{type:'array',cellDates:true});
+    processHoursWorkbook(wb,url);
+  }catch(e){
+    dashboard.innerHTML='<div class="error"><h3>No se pudo cargar Horas Extra</h3><p>'+escapeHtml(e.message)+'</p><p>Suba el Excel como <b>datos/horas_extra.xlsx</b> o utilice «Probar Excel local».</p></div>';
+    status.textContent='Horas Extra: archivo no disponible';
+  }
+}
+function processHoursWorkbook(wb,source){
+  try{
+    hoursRecords=parseHoursWorkbook(wb);
+    hoursSource=source;
+    renderHours();
+    status.textContent='Horas Extra: '+source+' · '+hoursRecords.length+' registros';
+  }catch(e){
+    dashboard.innerHTML='<div class="error">'+escapeHtml(e.message)+'</div>';
+    status.textContent='Error en el formato de horas extra';
+  }
+}
+const hoursFmt=n=>n.toLocaleString('es-CR',{minimumFractionDigits:1,maximumFractionDigits:1});
+function renderHours(){
+  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
+  const years=[...new Set(hoursRecords.map(x=>x.year))].sort((a,b)=>b-a);
+  dashboard.innerHTML=`
+    <div class="profile"><div><h2>Control anual de horas extra</h2><div class="hours-note">Fuente: ${escapeHtml(hoursSource)} · Valores en horas decimales</div></div></div>
+    <div class="hours-filters">
+      <label>Año<select id="hoursYear"><option value="all">Todos</option>${years.map(y=>`<option value="${y}" ${y===years[0]?'selected':''}>${y}</option>`).join('')}</select></label>
+      <label>Mes<select id="hoursMonth"><option value="all">Todos los meses</option>${HOURS_MONTHS.map((m,i)=>`<option value="${i+1}">${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}</select></label>
+      <label>Tipo<select id="hoursType"><option value="all">Todas</option><option value="Regular">Regular</option><option value="Doble">Doble</option></select></label>
+      <label>Colaborador<select id="hoursPerson"><option value="all">Todos</option>${[...new Set(hoursRecords.map(x=>x.name))].sort((a,b)=>a.localeCompare(b,'es')).map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('')}</select></label>
+      <button class="btn" id="hoursExport" type="button">Exportar CSV filtrado</button>
+    </div>
+    <div class="hours-grid" id="hoursKpis"></div>
+    <div class="hours-panels"><section class="hours-panel"><h3>Evolución mensual</h3><div class="hours-chart"><canvas id="hoursMonthly"></canvas></div></section><section class="hours-panel"><h3>Horas por tipo</h3><div class="hours-chart"><canvas id="hoursTypes"></canvas></div></section></div>
+    <div class="hours-panels"><section class="hours-panel"><h3>Colaboradores con más horas</h3><div class="hours-chart"><canvas id="hoursPeople"></canvas></div></section><section class="hours-panel"><h3>Comparación anual</h3><div class="hours-chart"><canvas id="hoursYears"></canvas></div></section></div>
+    <section class="hours-panel"><h3>Detalle por colaborador</h3><div class="table-wrap"><table class="hours-table"><thead><tr><th>Colaborador</th><th>Regular (h)</th><th>Doble (h)</th><th>Total (h)</th><th>Participación</th></tr></thead><tbody id="hoursRows"></tbody></table></div></section>
+    <p class="hours-note">Las horas regulares y dobles se suman como horas efectivamente registradas, sin multiplicar las dobles por dos. Los meses sin datos no se consideran registros reportados.</p>`;
+  ['hoursYear','hoursMonth','hoursType','hoursPerson'].forEach(id=>document.getElementById(id).addEventListener('change',updateHours));
+  document.getElementById('hoursExport').addEventListener('click',()=>{
+    const data=filteredHours();
+    const csv=['Colaborador;Año;Mes;Tipo;Horas',...data.map(x=>[x.name,x.year,HOURS_MONTHS[x.month-1],x.type,x.hours.toFixed(4).replace('.',',')].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';'))].join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='horas_extra_filtradas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  });
+  updateHours();
+}
+function filteredHours(){
+  const y=document.getElementById('hoursYear').value,m=document.getElementById('hoursMonth').value,t=document.getElementById('hoursType').value,p=document.getElementById('hoursPerson').value;
+  return hoursRecords.filter(x=>(y==='all'||x.year===+y)&&(m==='all'||x.month===+m)&&(t==='all'||x.type===t)&&(p==='all'||x.name===p));
+}
+function hoursChart(id,type,labels,datasets,options={}){
+  if(typeof Chart==='undefined')return;
+  const chart=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},...options}});
+  hoursCharts.push(chart);
+}
+function updateHours(){
+  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
+  const data=filteredHours(),sum=arr=>arr.reduce((a,x)=>a+x.hours,0);
+  const total=sum(data),regular=sum(data.filter(x=>x.type==='Regular')),double=sum(data.filter(x=>x.type==='Doble'));
+  const persons=new Set(data.filter(x=>x.hours>0).map(x=>x.name)).size;
+  const cards=[['Total horas',total,'h'],['Horas regulares',regular,'h'],['Horas dobles',double,'h'],['Colaboradores con horas',persons,'']];
+  document.getElementById('hoursKpis').innerHTML=cards.map(([label,n,unit])=>`<div class="card"><div class="label">${label}</div><div class="value">${unit?hoursFmt(n):n}${unit?' <small style="font-size:14px">h</small>':''}</div></div>`).join('');
+  const y=document.getElementById('hoursYear').value;
+  const months=y==='all'?[...new Set(data.map(x=>x.year+'-'+String(x.month).padStart(2,'0')))].sort():Array.from({length:12},(_,i)=>y+'-'+String(i+1).padStart(2,'0'));
+  const monthLabels=months.map(k=>{const [yr,mo]=k.split('-');return HOURS_MONTHS[+mo-1].slice(0,3)+' '+yr;});
+  hoursChart('hoursMonthly','bar',monthLabels,['Regular','Doble'].map((t,i)=>({label:t,data:months.map(k=>sum(data.filter(x=>x.type===t&&x.year+'-'+String(x.month).padStart(2,'0')===k))),backgroundColor:i?'#f3a65c':'#2f75b5'})),{scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}});
+  hoursChart('hoursTypes','doughnut',['Regular','Doble'],[{data:[regular,double],backgroundColor:['#2f75b5','#f3a65c']}]);
+  const byPerson=new Map();data.forEach(x=>byPerson.set(x.name,(byPerson.get(x.name)||0)+x.hours));
+  const top=[...byPerson].sort((a,b)=>b[1]-a[1]).slice(0,10);
+  hoursChart('hoursPeople','bar',top.map(x=>x[0]),[{label:'Horas',data:top.map(x=>x[1]),backgroundColor:'#25a18e'}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}});
+  const years=[...new Set(hoursRecords.map(x=>x.year))].sort();
+  hoursChart('hoursYears','bar',years.map(String),[{label:'Horas registradas',data:years.map(yr=>sum(data.filter(x=>x.year===yr))),backgroundColor:'#173b67'}],{scales:{y:{beginAtZero:true}}});
+  const names=[...new Set(data.map(x=>x.name))];
+  const table=names.map(name=>{const entries=data.filter(x=>x.name===name),r=sum(entries.filter(x=>x.type==='Regular')),d=sum(entries.filter(x=>x.type==='Doble'));return{name,r,d,total:r+d};}).sort((a,b)=>b.total-a.total);
+  document.getElementById('hoursRows').innerHTML=table.length?table.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${hoursFmt(x.r)}</td><td>${hoursFmt(x.d)}</td><td><b>${hoursFmt(x.total)}</b></td><td>${total?(x.total/total*100).toFixed(1):'0,0'}%</td></tr>`).join(''):'<tr><td colspan="5">No hay registros para los filtros seleccionados.</td></tr>';
+}
+
+
+document.getElementById('reload').addEventListener('click',loadHoursRemote);
+document.getElementById('excelInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{processHoursWorkbook(XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true}),f.name)}catch(err){status.textContent=err.message}});
+loadHoursRemote();
+</script></body></html>
