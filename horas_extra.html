@@ -1,748 +1,886 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Horas Extra | Ingeniería Eléctrica</title><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script><style>
-:root{
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control de Horas Extra | Ingeniería Eléctrica</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<style>
+:root {
   --navy:#173b67;
   --blue:#2f75b5;
-  --blue2:#8fb7df;
   --light:#e9f2f9;
-  --green:#d9ead3;
-  --green-strong:#25a18e;
-  --orange:#fce4d6;
-  --gray:#f4f6f8;
   --border:#d9e1e8;
   --text:#1d2733;
 }
-
-*{
-  box-sizing:border-box;
-}
-
-body{
+* {box-sizing:border-box}
+body {
   margin:0;
-  font-family:"Segoe UI",Arial,sans-serif;
   background:#eef3f7;
   color:var(--text);
+  font-family:"Segoe UI",Arial,sans-serif;
 }
-
-.app{
-  max-width:1650px;
-  margin:0 auto;
-  padding:18px;
-}
-
-.header{
+.app {max-width:1650px;margin:auto;padding:18px}
+header {
   background:var(--navy);
-  color:#fff;
+  color:white;
   border-radius:12px 12px 0 0;
-  padding:18px 24px;
+  padding:22px;
 }
-
-.header h1{
-  margin:0;
-  font-size:24px;
-}
-
-.header p{
-  margin:5px 0 0;
-  opacity:.88;
-  font-size:14px;
-}
-
-.toolbar{
+header h1 {margin:0;font-size:25px}
+header p {margin:7px 0 0;opacity:.85}
+.toolbar {
   display:flex;
-  align-items:center;
   gap:12px;
   flex-wrap:wrap;
-  background:#fff;
+  align-items:end;
+  background:white;
+  padding:18px;
   border:1px solid var(--border);
-  border-top:0;
-  padding:13px 18px;
 }
-
-.btn{
-  background:var(--navy);
-  color:#fff;
-  border:0;
+.field {display:flex;flex-direction:column;gap:5px}
+.field label {font-size:12px;font-weight:700}
+select,input,button {
+  padding:10px;
+  border:1px solid #c5d2df;
   border-radius:7px;
-  padding:10px 15px;
+  font:inherit;
+}
+button {
+  background:var(--navy);
+  color:white;
   font-weight:700;
   cursor:pointer;
 }
-
-.status{
-  font-size:13px;
-  color:#667788;
-}
-
-.dashboard{
-  background:#fff;
-  border:1px solid var(--border);
-  border-top:0;
+button:hover {background:#285989}
+.status {font-size:13px;color:#637485}
+main {
+  background:white;
   padding:18px;
-  min-height:520px;
+  border:1px solid var(--border);
 }
-
-.profile{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  gap:18px;
-  flex-wrap:wrap;
-  margin-bottom:15px;
-}
-
-.profile h2{
-  margin:0;
-  color:var(--navy);
-  font-size:25px;
-}
-
-.profile-meta{
+.cards {
   display:grid;
-  grid-template-columns:repeat(4,minmax(150px,1fr));
-  gap:8px;
-  width:min(900px,100%);
-}
-
-.meta-box{
-  background:var(--light);
-  padding:9px 11px;
-  border-radius:8px;
-  font-size:13px;
-}
-
-.meta-box b{
-  color:var(--navy);
-}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:12px;
-  margin-bottom:17px;
+  margin-bottom:18px;
 }
-
-.card{
+.card {
   border:1px solid var(--border);
   border-radius:10px;
-  padding:13px 14px;
-  background:#fff;
+  padding:16px;
 }
-
-.card .label{
-  font-size:12px;
-  text-transform:uppercase;
+.card .label {
   color:#6b7885;
+  font-size:12px;
   font-weight:800;
+  text-transform:uppercase;
 }
-
-.card .value{
-  font-size:29px;
+.card .value {
+  font-size:27px;
   font-weight:800;
   color:var(--navy);
-  margin-top:5px;
+  margin-top:7px;
 }
-
-.progress{
-  margin-top:8px;
-  height:13px;
-  background:#e6edf3;
-  border-radius:999px;
-  overflow:hidden;
+.charts {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  margin-bottom:18px;
 }
-
-.progress > div{
-  height:100%;
-  width:0;
-  background:var(--green-strong);
+.panel {
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:17px;
+  min-width:0;
+  margin-bottom:16px;
 }
-
-.table-wrap{
-  overflow-x:auto;
+.panel h2 {
+  color:var(--navy);
+  font-size:18px;
+  margin:0 0 12px;
 }
-
-table{
-  width:100%;
+.chartbox {height:310px;position:relative}
+.table-wrap {overflow:auto;max-height:550px}
+table {
   border-collapse:collapse;
-  min-width:1150px;
+  width:100%;
   font-size:13px;
 }
-
-thead th{
+th {
   background:var(--blue);
-  color:#fff;
-  padding:9px 7px;
-  text-align:center;
+  color:white;
+  padding:10px;
+  text-align:left;
+  position:sticky;
+  top:0;
+  white-space:nowrap;
 }
-
-td{
-  padding:6px 7px;
+td {
+  padding:9px;
   border-bottom:1px solid #e8edf2;
-  vertical-align:middle;
+}
+tbody tr:hover {background:#eef5fb}
+.num {text-align:right;font-variant-numeric:tabular-nums}
+.alert {
+  padding:11px;
+  border-left:4px solid #df9829;
+  background:#fff5e8;
+  margin:8px 0;
+  border-radius:5px;
+}
+.alert.critical {
+  border-color:#c53e3e;
+  background:#fff0f0;
+}
+.note {color:#667788;font-size:12px}
+.heat td {text-align:center;min-width:65px}
+.heat td:first-child {
+  text-align:left;
+  min-width:230px;
+  position:sticky;
+  left:0;
+  background:white;
+}
+@media(max-width:1100px) {
+  .cards {grid-template-columns:repeat(2,1fr)}
+  .charts {grid-template-columns:1fr}
+}
+@media(max-width:600px) {
+  .cards {grid-template-columns:1fr}
+  header h1 {font-size:20px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+<header>
+  <h1>CONTROL ANUAL DE HORAS EXTRA</h1>
+  <p>COOPEALFARORUIZ R.L. · Departamento de Ingeniería Eléctrica</p>
+</header>
+
+<section class="toolbar">
+  <div class="field">
+    <label>Año</label>
+    <select id="year"></select>
+  </div>
+  <div class="field">
+    <label>Mes</label>
+    <select id="month"></select>
+  </div>
+  <div class="field">
+    <label>Trabajador</label>
+    <select id="worker"></select>
+  </div>
+  <div class="field">
+    <label>Tipo de hora</label>
+    <select id="type">
+      <option value="Todas">Todas</option>
+      <option value="Regular">Regular</option>
+      <option value="Doble">Doble</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Alerta mensual (horas)</label>
+    <input id="threshold" type="number" min="0" step="1" value="30">
+  </div>
+  <button id="export">Exportar CSV</button>
+  <button onclick="location.href='index.html'">Volver al inicio</button>
+  <label>
+    <button type="button" onclick="document.getElementById('local').click()">
+      Probar Excel local
+    </button>
+    <input id="local" type="file" accept=".xlsx,.xls" hidden>
+  </label>
+  <span class="status" id="status">Cargando Excel...</span>
+</section>
+
+<main>
+  <section class="cards" id="cards"></section>
+
+  <section class="charts">
+    <div class="panel">
+      <h2>Horas extra por mes</h2>
+      <div class="chartbox"><canvas id="monthly"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Comparación entre años</h2>
+      <div class="chartbox"><canvas id="comparison"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Trabajadores con más horas extra</h2>
+      <div class="chartbox"><canvas id="ranking"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Distribución de horas</h2>
+      <div class="chartbox"><canvas id="distribution"></canvas></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Alertas y patrones detectados</h2>
+    <p class="note">
+      Las alertas son indicadores de gestión, no determinaciones
+      de incumplimiento laboral.
+    </p>
+    <div id="alerts"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Mapa de calor: trabajador por mes</h2>
+    <p class="note">
+      Los colores más intensos representan mayor acumulación mensual.
+      Los meses sin registros se muestran con un guion.
+    </p>
+    <div class="table-wrap" id="heatmap"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Detalle mensual por trabajador</h2>
+    <div class="table-wrap" id="detail"></div>
+  </section>
+</main>
+</div>
+
+<script>
+"use strict";
+
+const EXCEL_URL = "datos/horas_extra.xlsx";
+
+const MONTHS = [
+  "Enero","Febrero","Marzo","Abril",
+  "Mayo","Junio","Julio","Agosto",
+  "Septiembre","Octubre","Noviembre","Diciembre"
+];
+
+const $ = id => document.getElementById(id);
+const charts = {};
+let records = [];
+let availablePeriods = [];
+let currentFile = "";
+
+const numberFormat = new Intl.NumberFormat("es-CR", {
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+});
+
+function fmt(value) {
+  return numberFormat.format(value || 0);
 }
 
-th:nth-child(1){width:45px}
-th:nth-child(2){width:22%}
-th:nth-child(3){width:34%}
-th:nth-child(4){width:22%}
-th:nth-child(5){width:72px}
-th:nth-child(6){width:62px}
-th:nth-child(7){width:auto}
-
-.section-row td{
-  background:var(--blue2);
-  color:#fff;
-  font-weight:800;
-  text-align:center;
-  text-transform:uppercase;
+function norm(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .trim()
+    .replace(/\s+/g," ")
+    .toLowerCase();
 }
 
-.ok{
-  background:var(--green);
+function esc(value) {
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-.pending{
-  background:var(--orange);
-}
-
-.center{
-  text-align:center;
-}
-
-.bold{
-  font-weight:700;
-}
-
-.nav-bottom{
-  display:grid;
-  grid-template-columns:repeat(8,1fr);
-  gap:9px;
-  background:#fff;
-  border:1px solid var(--border);
-  border-top:0;
-  padding:15px 18px 18px;
-  border-radius:0 0 12px 12px;
-}
-
-.role-btn{
-  border:1px solid #b9c8d6;
-  background:#f7fafc;
-  color:#294d73;
-  border-radius:8px;
-  padding:12px 8px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.role-btn.active{
-  background:var(--navy);
-  color:#fff;
-  border-color:var(--navy);
-}
-
-.placeholder{
-  padding:80px 20px;
-  text-align:center;
-  color:#73808b;
-}
-
-.error{
-  padding:40px 20px;
-  text-align:center;
-  color:#8a2f2f;
-}
-
-@media(max-width:1100px){
-  .cards{
-    grid-template-columns:repeat(2,1fr);
+function num(value) {
+  if (typeof value === "number")
+    return Number.isFinite(value) ? value : 0;
+  if (typeof value === "string") {
+    const s = value.trim().replace(/\s/g,"");
+    const cleaned = s.includes(",") && s.includes(".")
+      ? s.replace(/\./g,"").replace(",",".")
+      : s.replace(",",".");
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? n : 0;
   }
-
-  .profile-meta{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .nav-bottom{
-    grid-template-columns:repeat(4,1fr);
-  }
+  return 0;
 }
 
-/* Horas Extra */
-.hours-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin:16px 0 20px}
-.hours-filters label{display:grid;gap:5px;font-size:12px;font-weight:700;color:var(--navy)}
-.hours-filters select{padding:10px;border:1px solid var(--border);border-radius:7px;background:white;min-width:150px}
-.hours-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
-.hours-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
-.hours-panel{border:1px solid var(--border);border-radius:12px;padding:16px;min-width:0}
-.hours-panel h3{margin:0 0 12px;color:var(--navy);font-size:16px}
-.hours-chart{height:300px;position:relative}
-.hours-note{font-size:12px;color:#697989;margin:8px 0 16px}
-.hours-table{min-width:750px}
-.hours-table th:nth-child(n){width:auto}
-.hours-table td:nth-child(n+2){text-align:right}
-.hours-table tbody tr:hover{background:#f1f6fa}
-@media(max-width:850px){.hours-grid{grid-template-columns:repeat(2,1fr)}.hours-panels{grid-template-columns:1fr}}
-@media(max-width:480px){.hours-grid{grid-template-columns:1fr}}
-</style></head><body><div class="app"><header class="header"><h1>HORAS EXTRA · CONTROL ANUAL</h1><p>COOPEALFARORUIZ · Departamento de Ingeniería Eléctrica</p></header><div class="toolbar"><label class="btn">Cargar Excel local<input id="excelInput" type="file" accept=".xlsx,.xls,.xlsm" hidden></label><button class="btn" id="reload" type="button">Actualizar desde GitHub</button><span class="status" id="status">Cargando datos...</span></div><main class="dashboard" id="dashboard"><div class="placeholder">Cargando información...</div></main></div><script>
-const dashboard=document.getElementById('dashboard');const status=document.getElementById('status');
-function normalize(value){
-
-  return String(
-    value ?? ""
-  )
-  .normalize("NFD")
-  .replace(
-    /[\u0300-\u036f]/g,
-    ""
-  )
-  .toUpperCase()
-  .trim();
-
+function sum(rows, field) {
+  return rows.reduce((total,r) => total + (r[field] || 0),0);
 }
 
-
-function checked(value){
-
-  if(
-    value === true ||
-    value === 1
-  ){
-
-    return true;
-
-  }
-
-
-  const text =
-    normalize(value);
-
-
-  return [
-
-    "TRUE",
-    "VERDADERO",
-    "SI",
-    "SÍ",
-    "X",
-    "1",
-    "OK",
-    "CUMPLIDO",
-    "☑",
-    "✓",
-    "✔"
-
-  ].includes(text);
-
+function group(rows, keyFn) {
+  const result = new Map();
+  rows.forEach(r => {
+    const key = keyFn(r);
+    if (!result.has(key)) result.set(key,[]);
+    result.get(key).push(r);
+  });
+  return result;
 }
 
-
-function formatDate(value){
-
-  if(
-    value instanceof Date &&
-    !isNaN(value)
-  ){
-
-    return new Intl.DateTimeFormat(
-      "es-CR",
-      {
-        day:"2-digit",
-        month:"short",
-        year:"numeric"
-      }
-    ).format(value);
-
-  }
-
-
-  if(
-    typeof value === "number"
-  ){
-
-    const d =
-      XLSX.SSF.parse_date_code(
-        value
-      );
-
-
-    if(d){
-
-      return (
-        String(d.d).padStart(2,"0")
-        + "/"
-        + String(d.m).padStart(2,"0")
-        + "/"
-        + d.y
-      );
-
-    }
-
-  }
-
-
-  return String(
-    value || ""
-  );
-
+function periodKey(year,month) {
+  return `${year}-${String(month).padStart(2,"0")}`;
 }
 
+function parseWorkbook(workbook) {
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  if (!sheet) throw new Error("El Excel no contiene hojas.");
 
-function monthName(value){
+  const rows = XLSX.utils.sheet_to_json(sheet,{
+    header:1,defval:"",raw:true
+  });
 
-  let date = value;
+  if (!rows.length) throw new Error("La hoja está vacía.");
 
+  const columns = [];
 
-  if(
-    typeof value === "number"
-  ){
-
-    const d =
-      XLSX.SSF.parse_date_code(
-        value
-      );
-
-
-    if(d){
-
-      date =
-        new Date(
-          d.y,
-          d.m - 1,
-          d.d
-        );
-
-    }
-
-  }
-
-
-  if(
-    date instanceof Date &&
-    !isNaN(date)
-  ){
-
-    return new Intl.DateTimeFormat(
-      "es-CR",
-      {
-        month:"long",
-        year:"numeric"
-      }
-    ).format(date);
-
-  }
-
-
-  return String(
-    value || ""
-  );
-
-}
-
-
-function escapeHtml(value){
-
-  return String(
-    value ?? ""
-  )
-  .replaceAll(
-    "&",
-    "&amp;"
-  )
-  .replaceAll(
-    "<",
-    "&lt;"
-  )
-  .replaceAll(
-    ">",
-    "&gt;"
-  )
-  .replaceAll(
-    '"',
-    "&quot;"
-  )
-  .replaceAll(
-    "'",
-    "&#039;"
-  );
-
-}
-
-
-/* =====================================================
-   INICIO AUTOMÁTICO
-   ===================================================== */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
-
-    await loadRemoteExcel(
-      FILES.asistente,
-      "Asistente"
+  rows[0].forEach((cell,index) => {
+    const text = norm(cell);
+    const match = text.match(
+      /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+(20\d{2})$/
     );
 
-  }
-);
+    if (!match) return;
 
+    let monthName = match[1];
+    if (monthName === "setiembre") monthName = "septiembre";
 
-/* ================= HORAS EXTRA ================= */
-let hoursRecords = [];
-let hoursSource = '';
-let hoursCharts = [];
-const HOURS_MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-function hoursNum(v){
-  if(typeof v==='number') return Number.isFinite(v)?v:0;
-  if(typeof v==='string'){
-    const t=v.trim().replace(/\s/g,'');
-    if(!t) return 0;
-    const n=Number(t.includes(',')?t.replace(/\./g,'').replace(',','.'):t);
-    return Number.isFinite(n)?n:0;
-  }
-  return 0;
-}
-function parseHoursWorkbook(workbook){
-  const sheet=workbook.Sheets[workbook.SheetNames[0]];
-  if(!sheet) throw new Error('El archivo no contiene hojas');
-  const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:true});
-  const headers=rows[0]||[];
-  const cols=[];
-  headers.forEach((v,i)=>{
-    const m=normalize(v).toLowerCase().match(/^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2})$/);
-    if(m) cols.push({i,month:HOURS_MONTHS.indexOf(m[1])+1,year:Number(m[2])});
+    const month = MONTHS.findIndex(
+      m => norm(m) === monthName
+    ) + 1;
+
+    if (month > 0) {
+      columns.push({
+        index,month,year:Number(match[2])
+      });
+    }
   });
-  if(!cols.length) throw new Error('No se encontraron columnas con formato «enero 2025», «febrero 2025», etc.');
-  let type=null;
-  const result=[];
-  rows.slice(1).forEach(row=>{
-    const name=String(row[0]??'').trim();
-    const norm=normalize(name);
-    if(norm.includes('HORAS EXTRA REGULAR')){type='Regular';return;}
-    if(norm.includes('HORA EXTRA DOBLE')){type='Doble';return;}
-    if(!name||norm.includes('INGENIERIA ELECTRICA')||!type)return;
-    cols.forEach(c=>{
-      const raw=row[c.i];
-      if(raw===''||raw===null||raw===undefined)return;
-      const value=hoursNum(raw);
-      if(value<0)return;
-      result.push({name,type,year:c.year,month:c.month,hours:value});
+
+  if (!columns.length)
+    throw new Error("No se encontraron encabezados como enero 2025.");
+
+  availablePeriods = [...new Set(
+    columns.map(c => periodKey(c.year,c.month))
+  )];
+
+  const data = new Map();
+  let section = null;
+
+  for (let i=1;i<rows.length;i++) {
+    const row = rows[i];
+    const label = String(row[0] ?? "").trim();
+    const normalized = norm(label);
+
+    if (!label) continue;
+
+    // Identificar el bloque de horas regulares
+    if (
+      normalized.includes("hora extra regular") ||
+      normalized.includes("horas extra regular")
+    ) {
+      section = "Regular";
+      continue;
+    }
+
+    // Identificar el bloque de horas dobles
+    if (
+      normalized.includes("hora extra doble") ||
+      normalized.includes("horas extra doble")
+    ) {
+      section = "Doble";
+      continue;
+    }
+
+    if (!section) continue;
+
+    // Excluir subtotales, totales y encabezados.
+    if (
+      normalized.includes("total") ||
+      normalized.includes("subtotal") ||
+      normalized === "ingenieria electrica" ||
+      normalized.startsWith("horas extra")
+    ) continue;
+
+    const hasValues = columns.some(c =>
+      row[c.index] !== "" &&
+      row[c.index] !== null &&
+      row[c.index] !== undefined
+    );
+
+    if (!hasValues) continue;
+
+    for (const c of columns) {
+      const raw = row[c.index];
+      if (raw === "" || raw === null || raw === undefined)
+        continue;
+
+      const hours = num(raw);
+      const key = [
+        norm(label),c.year,c.month
+      ].join("|");
+
+      if (!data.has(key)) {
+        data.set(key,{
+          worker:label,
+          year:c.year,
+          month:c.month,
+          regular:0,
+          double:0
+        });
+      }
+
+      const item = data.get(key);
+
+      if (section === "Regular")
+        item.regular += hours;
+      else
+        item.double += hours;
+    }
+  }
+
+  records = [...data.values()].map(r => ({
+    ...r,total:r.regular+r.double
+  }));
+
+  if (!records.length)
+    throw new Error("No se encontraron registros por trabajador.");
+
+  initializeFilters();
+  render();
+}
+
+function initializeFilters() {
+  const years = [...new Set(
+    availablePeriods.map(p => Number(p.slice(0,4)))
+  )].sort((a,b)=>b-a);
+
+  $("year").innerHTML =
+    '<option value="Todos">Todos los años</option>' +
+    years.map(y=>`<option value="${y}">${y}</option>`).join("");
+
+  $("year").value = String(years[0]);
+
+  $("month").innerHTML =
+    '<option value="Todos">Todos los meses</option>' +
+    MONTHS.map((m,i)=>
+      `<option value="${i+1}">${m}</option>`
+    ).join("");
+
+  const workers = [...new Set(
+    records.map(r=>r.worker)
+  )].sort((a,b)=>a.localeCompare(b,"es"));
+
+  $("worker").innerHTML =
+    '<option value="Todos">Todos los trabajadores</option>' +
+    workers.map(w=>
+      `<option value="${esc(w)}">${esc(w)}</option>`
+    ).join("");
+}
+
+function filteredData(ignoreYear=false) {
+  const year = $("year").value;
+  const month = $("month").value;
+  const worker = $("worker").value;
+  const type = $("type").value;
+
+  return records.filter(r =>
+    (ignoreYear || year === "Todos" || r.year === Number(year)) &&
+    (month === "Todos" || r.month === Number(month)) &&
+    (worker === "Todos" || r.worker === worker)
+  ).map(r => {
+    const regular = type === "Doble" ? 0 : r.regular;
+    const double = type === "Regular" ? 0 : r.double;
+    return {...r,regular,double,total:regular+double};
+  });
+}
+
+function card(label,value) {
+  return `<div class="card">
+    <div class="label">${label}</div>
+    <div class="value">${value}</div>
+  </div>`;
+}
+
+function renderCards(data) {
+  const total = sum(data,"total");
+  const regular = sum(data,"regular");
+  const double = sum(data,"double");
+  const workers = new Set(
+    data.filter(r=>r.total>0).map(r=>r.worker)
+  ).size;
+  const periods = new Set(
+    data.map(r=>periodKey(r.year,r.month))
+  ).size;
+
+  $("cards").innerHTML =
+    card("Total de horas",fmt(total)+" h") +
+    card("Horas regulares",fmt(regular)+" h") +
+    card("Horas dobles",fmt(double)+" h") +
+    card("Trabajadores",workers) +
+    card("Meses con registros",periods);
+}
+
+function drawChart(id,type,data,options={}) {
+  if (charts[id]) charts[id].destroy();
+
+  charts[id] = new Chart($(id),{
+    type,
+    data,
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:true,position:"bottom"}
+      },
+      ...options
+    }
+  });
+}
+
+function renderMonthly(data) {
+  const regular = Array(12).fill(0);
+  const double = Array(12).fill(0);
+
+  data.forEach(r=>{
+    regular[r.month-1] += r.regular;
+    double[r.month-1] += r.double;
+  });
+
+  drawChart("monthly","bar",{
+    labels:MONTHS,
+    datasets:[
+      {
+        label:"Horas regulares",
+        data:regular,
+        backgroundColor:"#2f75b5"
+      },
+      {
+        label:"Horas dobles",
+        data:double,
+        backgroundColor:"#e4a34c"
+      }
+    ]
+  },{
+    scales:{
+      x:{stacked:true},
+      y:{stacked:true,beginAtZero:true}
+    }
+  });
+}
+
+function renderComparison() {
+  const data = filteredData(true);
+  const years = [...new Set(
+    records.map(r=>r.year)
+  )].sort();
+
+  // Comparar solamente meses que tengan datos
+  // en todos los años seleccionados.
+  const commonMonths = MONTHS.map((_,i)=>i+1).filter(m=>
+    years.every(y=>availablePeriods.includes(periodKey(y,m)))
+  );
+
+  const selectedMonth = $("month").value;
+  const months = selectedMonth === "Todos"
+    ? commonMonths
+    : commonMonths.filter(m=>m===Number(selectedMonth));
+
+  const colors = ["#2f75b5","#25a18e","#e4a34c","#8856a7"];
+
+  drawChart("comparison","bar",{
+    labels:months.map(m=>MONTHS[m-1]),
+    datasets:years.map((year,i)=>({
+      label:String(year),
+      data:months.map(month=>
+        sum(data.filter(r=>
+          r.year===year && r.month===month
+        ),"total")
+      ),
+      backgroundColor:colors[i%colors.length]
+    }))
+  },{
+    scales:{y:{beginAtZero:true}}
+  });
+}
+
+function renderRanking(data) {
+  const workers = [...group(data,r=>r.worker)]
+    .map(([name,rows])=>({
+      name,total:sum(rows,"total")
+    }))
+    .sort((a,b)=>b.total-a.total)
+    .slice(0,10);
+
+  drawChart("ranking","bar",{
+    labels:workers.map(x=>x.name),
+    datasets:[{
+      label:"Horas extra",
+      data:workers.map(x=>x.total),
+      backgroundColor:"#2f75b5"
+    }]
+  },{
+    indexAxis:"y",
+    scales:{x:{beginAtZero:true}},
+    plugins:{legend:{display:false}}
+  });
+}
+
+function renderDistribution(data) {
+  drawChart("distribution","doughnut",{
+    labels:["Regulares","Dobles"],
+    datasets:[{
+      data:[sum(data,"regular"),sum(data,"double")],
+      backgroundColor:["#2f75b5","#e4a34c"]
+    }]
+  });
+}
+
+function renderAlerts(data) {
+  const threshold = Math.max(0,num($("threshold").value));
+  const alerts = [];
+
+  const monthly = [...group(data,r=>
+    `${r.worker}|${r.year}|${r.month}`
+  )].map(([key,rows])=>({
+    ...rows[0],total:sum(rows,"total")
+  }));
+
+  monthly.filter(r=>r.total>=threshold && r.total>0)
+    .sort((a,b)=>b.total-a.total)
+    .slice(0,15)
+    .forEach(r=>{
+      alerts.push({
+        critical:true,
+        message:`${r.worker}: ${fmt(r.total)} horas en
+          ${MONTHS[r.month-1]} ${r.year}.
+          Supera o alcanza el umbral de ${fmt(threshold)} h.`
+      });
     });
-  });
-  if(!result.length)throw new Error('No se encontraron registros por colaborador');
-  return result;
-}
-async function loadHoursRemote(){
-  const url=FILES.horasextra;
-  dashboard.innerHTML='<div class="placeholder">Cargando horas extra...</div>';
-  status.textContent='Leyendo '+url;
-  try{
-    const response=await fetch(url+'?v='+Date.now(),{cache:'no-store'});
-    if(!response.ok)throw new Error('No se encontró '+url+' (HTTP '+response.status+')');
-    const wb=XLSX.read(await response.arrayBuffer(),{type:'array',cellDates:true});
-    processHoursWorkbook(wb,url);
-  }catch(e){
-    dashboard.innerHTML='<div class="error"><h3>No se pudo cargar Horas Extra</h3><p>'+escapeHtml(e.message)+'</p><p>Suba el Excel como <b>datos/horas_extra.xlsx</b> o utilice «Probar Excel local».</p></div>';
-    status.textContent='Horas Extra: archivo no disponible';
+
+  const byWorkerYear = group(monthly,r=>`${r.worker}|${r.year}`);
+
+  for (const rows of byWorkerYear.values()) {
+    const ordered = [...rows].sort((a,b)=>a.month-b.month);
+
+    for (let i=2;i<ordered.length;i++) {
+      const a=ordered[i-2],b=ordered[i-1],c=ordered[i];
+
+      if (
+        b.month===a.month+1 &&
+        c.month===b.month+1 &&
+        a.total>0 &&
+        b.total>a.total &&
+        c.total>b.total
+      ) {
+        alerts.push({
+          critical:false,
+          message:`Tendencia creciente: ${c.worker}
+            registra tres meses consecutivos de aumento
+            hasta ${MONTHS[c.month-1]} ${c.year}.`
+        });
+      }
+    }
   }
-}
-function processHoursWorkbook(wb,source){
-  try{
-    hoursRecords=parseHoursWorkbook(wb);
-    hoursSource=source;
-    renderHours();
-    status.textContent='Horas Extra: '+source+' · '+hoursRecords.length+' registros';
-  }catch(e){
-    dashboard.innerHTML='<div class="error">'+escapeHtml(e.message)+'</div>';
-    status.textContent='Error en el formato de horas extra';
+
+  const byPeriod = [...group(monthly,r=>
+    periodKey(r.year,r.month)
+  )].map(([period,rows])=>({
+    period,total:sum(rows,"total")
+  })).sort((a,b)=>b.total-a.total);
+
+  if (byPeriod.length) {
+    const top=byPeriod[0];
+    alerts.push({
+      critical:false,
+      message:`Mes de mayor acumulación dentro del filtro:
+        ${top.period}, con ${fmt(top.total)} horas.`
+    });
   }
-}
-const hoursFmt=n=>n.toLocaleString('es-CR',{minimumFractionDigits:1,maximumFractionDigits:1});
-function renderHours(){
-  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
-  const years=[...new Set(hoursRecords.map(x=>x.year))].sort((a,b)=>b-a);
-  dashboard.innerHTML=`
-    <div class="profile"><div><h2>Control anual de horas extra</h2><div class="hours-note">Fuente: ${escapeHtml(hoursSource)} · Valores en horas decimales</div></div></div>
-    <div class="hours-filters">
-      <label>Año<select id="hoursYear"><option value="all">Todos</option>${years.map(y=>`<option value="${y}" ${y===years[0]?'selected':''}>${y}</option>`).join('')}</select></label>
-      <label>Mes<select id="hoursMonth"><option value="all">Todos los meses</option>${HOURS_MONTHS.map((m,i)=>`<option value="${i+1}">${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}</select></label>
-      <label>Tipo<select id="hoursType"><option value="all">Todas</option><option value="Regular">Regular</option><option value="Doble">Doble</option></select></label>
-      <label>Colaborador<select id="hoursPerson"><option value="all">Todos</option>${[...new Set(hoursRecords.map(x=>x.name))].sort((a,b)=>a.localeCompare(b,'es')).map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('')}</select></label>
-      <button class="btn" id="hoursExport" type="button">Exportar CSV filtrado</button>
-    </div>
-    <div class="hours-grid" id="hoursKpis"></div>
-    <div class="hours-panels"><section class="hours-panel"><h3>Evolución mensual</h3><div class="hours-chart"><canvas id="hoursMonthly"></canvas></div></section><section class="hours-panel"><h3>Horas por tipo</h3><div class="hours-chart"><canvas id="hoursTypes"></canvas></div></section></div>
-    <div class="hours-panels"><section class="hours-panel"><h3>Colaboradores con más horas</h3><div class="hours-chart"><canvas id="hoursPeople"></canvas></div></section><section class="hours-panel"><h3>Comparación anual</h3><div class="hours-chart"><canvas id="hoursYears"></canvas></div></section></div>
-    <section class="hours-panel"><h3>Detalle por colaborador</h3><div class="table-wrap"><table class="hours-table"><thead><tr><th>Colaborador</th><th>Regular (h)</th><th>Doble (h)</th><th>Total (h)</th><th>Participación</th></tr></thead><tbody id="hoursRows"></tbody></table></div></section>
-    <p class="hours-note">Las horas regulares y dobles se suman como horas efectivamente registradas, sin multiplicar las dobles por dos. Los meses sin datos no se consideran registros reportados.</p>`;
-  ['hoursYear','hoursMonth','hoursType','hoursPerson'].forEach(id=>document.getElementById(id).addEventListener('change',updateHours));
-  document.getElementById('hoursExport').addEventListener('click',()=>{
-    const data=filteredHours();
-    const csv=['Colaborador;Año;Mes;Tipo;Horas',...data.map(x=>[x.name,x.year,HOURS_MONTHS[x.month-1],x.type,x.hours.toFixed(4).replace('.',',')].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';'))].join('\r\n');
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='horas_extra_filtradas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  });
-  updateHours();
-}
-function filteredHours(){
-  const y=document.getElementById('hoursYear').value,m=document.getElementById('hoursMonth').value,t=document.getElementById('hoursType').value,p=document.getElementById('hoursPerson').value;
-  return hoursRecords.filter(x=>(y==='all'||x.year===+y)&&(m==='all'||x.month===+m)&&(t==='all'||x.type===t)&&(p==='all'||x.name===p));
-}
-function hoursChart(id,type,labels,datasets,options={}){
-  if(typeof Chart==='undefined')return;
-  const chart=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},...options}});
-  hoursCharts.push(chart);
-}
-function updateHours(){
-  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
-  const data=filteredHours(),sum=arr=>arr.reduce((a,x)=>a+x.hours,0);
-  const total=sum(data),regular=sum(data.filter(x=>x.type==='Regular')),double=sum(data.filter(x=>x.type==='Doble'));
-  const persons=new Set(data.filter(x=>x.hours>0).map(x=>x.name)).size;
-  const cards=[['Total horas',total,'h'],['Horas regulares',regular,'h'],['Horas dobles',double,'h'],['Colaboradores con horas',persons,'']];
-  document.getElementById('hoursKpis').innerHTML=cards.map(([label,n,unit])=>`<div class="card"><div class="label">${label}</div><div class="value">${unit?hoursFmt(n):n}${unit?' <small style="font-size:14px">h</small>':''}</div></div>`).join('');
-  const y=document.getElementById('hoursYear').value;
-  const months=y==='all'?[...new Set(data.map(x=>x.year+'-'+String(x.month).padStart(2,'0')))].sort():Array.from({length:12},(_,i)=>y+'-'+String(i+1).padStart(2,'0'));
-  const monthLabels=months.map(k=>{const [yr,mo]=k.split('-');return HOURS_MONTHS[+mo-1].slice(0,3)+' '+yr;});
-  hoursChart('hoursMonthly','bar',monthLabels,['Regular','Doble'].map((t,i)=>({label:t,data:months.map(k=>sum(data.filter(x=>x.type===t&&x.year+'-'+String(x.month).padStart(2,'0')===k))),backgroundColor:i?'#f3a65c':'#2f75b5'})),{scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}});
-  hoursChart('hoursTypes','doughnut',['Regular','Doble'],[{data:[regular,double],backgroundColor:['#2f75b5','#f3a65c']}]);
-  const byPerson=new Map();data.forEach(x=>byPerson.set(x.name,(byPerson.get(x.name)||0)+x.hours));
-  const top=[...byPerson].sort((a,b)=>b[1]-a[1]).slice(0,10);
-  hoursChart('hoursPeople','bar',top.map(x=>x[0]),[{label:'Horas',data:top.map(x=>x[1]),backgroundColor:'#25a18e'}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}});
-  const years=[...new Set(hoursRecords.map(x=>x.year))].sort();
-  hoursChart('hoursYears','bar',years.map(String),[{label:'Horas registradas',data:years.map(yr=>sum(data.filter(x=>x.year===yr))),backgroundColor:'#173b67'}],{scales:{y:{beginAtZero:true}}});
-  const names=[...new Set(data.map(x=>x.name))];
-  const table=names.map(name=>{const entries=data.filter(x=>x.name===name),r=sum(entries.filter(x=>x.type==='Regular')),d=sum(entries.filter(x=>x.type==='Doble'));return{name,r,d,total:r+d};}).sort((a,b)=>b.total-a.total);
-  document.getElementById('hoursRows').innerHTML=table.length?table.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${hoursFmt(x.r)}</td><td>${hoursFmt(x.d)}</td><td><b>${hoursFmt(x.total)}</b></td><td>${total?(x.total/total*100).toFixed(1):'0,0'}%</td></tr>`).join(''):'<tr><td colspan="5">No hay registros para los filtros seleccionados.</td></tr>';
+
+  $("alerts").innerHTML = alerts.length
+    ? alerts.map(a=>`
+      <div class="alert ${a.critical?"critical":""}">
+        ${esc(a.message)}
+      </div>`).join("")
+    : "<p>No se detectaron alertas con los filtros actuales.</p>";
 }
 
+function renderHeatmap(data) {
+  const year = $("year").value;
+  const workerMap = group(data,r=>r.worker);
+  const max = Math.max(1,...data.map(r=>r.total));
+
+  const years = year==="Todos"
+    ? [...new Set(data.map(r=>r.year))].sort()
+    : [Number(year)];
+
+  let html="";
+
+  years.forEach(y=>{
+    html+=`<h3>${y}</h3><table class="heat">
+      <thead><tr><th>Trabajador</th>
+      ${MONTHS.map(m=>`<th>${m.slice(0,3)}</th>`).join("")}
+      </tr></thead><tbody>`;
+
+    for (const [worker,rows] of workerMap) {
+      html+=`<tr><td>${esc(worker)}</td>`;
+
+      for(let m=1;m<=12;m++) {
+        const periodAvailable =
+          availablePeriods.includes(periodKey(y,m));
+
+        const item=rows.find(r=>r.year===y && r.month===m);
+        const value=item?.total || 0;
+
+        if (!periodAvailable) {
+          html+="<td>—</td>";
+          continue;
+        }
+
+        const alpha=value>0 ? .12+.72*(value/max) : 0;
+        const background=value>0
+          ? `rgba(47,117,181,${alpha})`
+          : "#f5f7f9";
+
+        html+=`<td style="background:${background}"
+          title="${esc(worker)} - ${MONTHS[m-1]} ${y}">
+          ${value>0?fmt(value):"0"}
+        </td>`;
+      }
+
+      html+="</tr>";
+    }
+
+    html+="</tbody></table>";
+  });
+
+  $("heatmap").innerHTML=html ||
+    "<p>No hay datos para mostrar.</p>";
+}
+
+function renderDetail(data) {
+  const ordered=[...data].sort((a,b)=>
+    a.worker.localeCompare(b.worker,"es") ||
+    b.year-a.year ||
+    a.month-b.month
+  );
+
+  $("detail").innerHTML=`
+    <table>
+      <thead><tr>
+        <th>Trabajador</th>
+        <th>Año</th>
+        <th>Mes</th>
+        <th class="num">Regular (h)</th>
+        <th class="num">Doble (h)</th>
+        <th class="num">Total (h)</th>
+      </tr></thead>
+      <tbody>
+        ${ordered.map(r=>`<tr>
+          <td>${esc(r.worker)}</td>
+          <td>${r.year}</td>
+          <td>${MONTHS[r.month-1]}</td>
+          <td class="num">${fmt(r.regular)}</td>
+          <td class="num">${fmt(r.double)}</td>
+          <td class="num"><b>${fmt(r.total)}</b></td>
+        </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+function render() {
+  const data=filteredData();
+
+  renderCards(data);
+  renderMonthly(data);
+  renderComparison();
+  renderRanking(data);
+  renderDistribution(data);
+  renderAlerts(data);
+  renderHeatmap(data);
+  renderDetail(data);
+}
+
+function exportCSV() {
+  const rows=filteredData();
+  const lines=[
+    ["Trabajador","Año","Mes","Regular","Doble","Total"],
+    ...rows.map(r=>[
+      r.worker,r.year,MONTHS[r.month-1],
+      r.regular,r.double,r.total
+    ])
+  ];
+
+  const csv="\uFEFF"+lines.map(row=>
+    row.map(v=>`"${String(v).replaceAll('"','""')}"`).join(";")
+  ).join("\r\n");
+
+  const blob=new Blob([csv],{
+    type:"text/csv;charset=utf-8"
+  });
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download="control_horas_extra.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+async function loadRemote() {
+  try {
+    $("status").textContent="Cargando "+EXCEL_URL+"...";
+
+    const response=await fetch(
+      EXCEL_URL+"?v="+Date.now()
+    );
+
+    if (!response.ok)
+      throw new Error("No se encontró "+EXCEL_URL);
+
+    const buffer=await response.arrayBuffer();
+    const workbook=XLSX.read(buffer,{
+      type:"array",cellDates:true
+    });
+
+    parseWorkbook(workbook);
+    currentFile=EXCEL_URL;
+    $("status").textContent="Datos cargados desde GitHub.";
+  } catch(error) {
+    console.error(error);
+    $("status").textContent="Error: "+error.message;
+    $("cards").innerHTML=`
+      <p>No se pudo cargar el Excel.
+      Verifique la ruta datos/horas_extra.xlsx.</p>`;
+  }
+}
+
+$("local").addEventListener("change",async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+
+  try {
+    const buffer=await file.arrayBuffer();
+    const workbook=XLSX.read(buffer,{
+      type:"array",cellDates:true
+    });
+
+    parseWorkbook(workbook);
+    currentFile=file.name;
+    $("status").textContent="Archivo local: "+file.name;
+  } catch(error) {
+    console.error(error);
+    $("status").textContent="Error: "+error.message;
+  }
+});
+
+["year","month","worker","type","threshold"].forEach(id=>{
+  $(id).addEventListener("change",render);
+});
+
+$("export").addEventListener("click",exportCSV);
+
+document.addEventListener("DOMContentLoaded",loadRemote);
 </script>
-
 </body>
 </html>
-/* ================= HORAS EXTRA ================= */
-let hoursRecords = [];
-let hoursSource = '';
-let hoursCharts = [];
-const HOURS_MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-function hoursNum(v){
-  if(typeof v==='number') return Number.isFinite(v)?v:0;
-  if(typeof v==='string'){
-    const t=v.trim().replace(/\s/g,'');
-    if(!t) return 0;
-    const n=Number(t.includes(',')?t.replace(/\./g,'').replace(',','.'):t);
-    return Number.isFinite(n)?n:0;
-  }
-  return 0;
-}
-function parseHoursWorkbook(workbook){
-  const sheet=workbook.Sheets[workbook.SheetNames[0]];
-  if(!sheet) throw new Error('El archivo no contiene hojas');
-  const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:true});
-  const headers=rows[0]||[];
-  const cols=[];
-  headers.forEach((v,i)=>{
-    const m=normalize(v).toLowerCase().match(/^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2})$/);
-    if(m) cols.push({i,month:HOURS_MONTHS.indexOf(m[1])+1,year:Number(m[2])});
-  });
-  if(!cols.length) throw new Error('No se encontraron columnas con formato «enero 2025», «febrero 2025», etc.');
-  let type=null;
-  const result=[];
-  rows.slice(1).forEach(row=>{
-    const name=String(row[0]??'').trim();
-    const norm=normalize(name);
-    if(norm.includes('HORAS EXTRA REGULAR')){type='Regular';return;}
-    if(norm.includes('HORA EXTRA DOBLE')){type='Doble';return;}
-    if(!name||norm.includes('INGENIERIA ELECTRICA')||!type)return;
-    cols.forEach(c=>{
-      const raw=row[c.i];
-      if(raw===''||raw===null||raw===undefined)return;
-      const value=hoursNum(raw);
-      if(value<0)return;
-      result.push({name,type,year:c.year,month:c.month,hours:value});
-    });
-  });
-  if(!result.length)throw new Error('No se encontraron registros por colaborador');
-  return result;
-}
-async function loadHoursRemote(){
-  const url='datos/horas_extra.xlsx';
-  dashboard.innerHTML='<div class="placeholder">Cargando horas extra...</div>';
-  status.textContent='Leyendo '+url;
-  try{
-    const response=await fetch(url+'?v='+Date.now(),{cache:'no-store'});
-    if(!response.ok)throw new Error('No se encontró '+url+' (HTTP '+response.status+')');
-    const wb=XLSX.read(await response.arrayBuffer(),{type:'array',cellDates:true});
-    processHoursWorkbook(wb,url);
-  }catch(e){
-    dashboard.innerHTML='<div class="error"><h3>No se pudo cargar Horas Extra</h3><p>'+escapeHtml(e.message)+'</p><p>Suba el Excel como <b>datos/horas_extra.xlsx</b> o utilice «Probar Excel local».</p></div>';
-    status.textContent='Horas Extra: archivo no disponible';
-  }
-}
-function processHoursWorkbook(wb,source){
-  try{
-    hoursRecords=parseHoursWorkbook(wb);
-    hoursSource=source;
-    renderHours();
-    status.textContent='Horas Extra: '+source+' · '+hoursRecords.length+' registros';
-  }catch(e){
-    dashboard.innerHTML='<div class="error">'+escapeHtml(e.message)+'</div>';
-    status.textContent='Error en el formato de horas extra';
-  }
-}
-const hoursFmt=n=>n.toLocaleString('es-CR',{minimumFractionDigits:1,maximumFractionDigits:1});
-function renderHours(){
-  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
-  const years=[...new Set(hoursRecords.map(x=>x.year))].sort((a,b)=>b-a);
-  dashboard.innerHTML=`
-    <div class="profile"><div><h2>Control anual de horas extra</h2><div class="hours-note">Fuente: ${escapeHtml(hoursSource)} · Valores en horas decimales</div></div></div>
-    <div class="hours-filters">
-      <label>Año<select id="hoursYear"><option value="all">Todos</option>${years.map(y=>`<option value="${y}" ${y===years[0]?'selected':''}>${y}</option>`).join('')}</select></label>
-      <label>Mes<select id="hoursMonth"><option value="all">Todos los meses</option>${HOURS_MONTHS.map((m,i)=>`<option value="${i+1}">${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}</select></label>
-      <label>Tipo<select id="hoursType"><option value="all">Todas</option><option value="Regular">Regular</option><option value="Doble">Doble</option></select></label>
-      <label>Colaborador<select id="hoursPerson"><option value="all">Todos</option>${[...new Set(hoursRecords.map(x=>x.name))].sort((a,b)=>a.localeCompare(b,'es')).map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('')}</select></label>
-      <button class="btn" id="hoursExport" type="button">Exportar CSV filtrado</button>
-    </div>
-    <div class="hours-grid" id="hoursKpis"></div>
-    <div class="hours-panels"><section class="hours-panel"><h3>Evolución mensual</h3><div class="hours-chart"><canvas id="hoursMonthly"></canvas></div></section><section class="hours-panel"><h3>Horas por tipo</h3><div class="hours-chart"><canvas id="hoursTypes"></canvas></div></section></div>
-    <div class="hours-panels"><section class="hours-panel"><h3>Colaboradores con más horas</h3><div class="hours-chart"><canvas id="hoursPeople"></canvas></div></section><section class="hours-panel"><h3>Comparación anual</h3><div class="hours-chart"><canvas id="hoursYears"></canvas></div></section></div>
-    <section class="hours-panel"><h3>Detalle por colaborador</h3><div class="table-wrap"><table class="hours-table"><thead><tr><th>Colaborador</th><th>Regular (h)</th><th>Doble (h)</th><th>Total (h)</th><th>Participación</th></tr></thead><tbody id="hoursRows"></tbody></table></div></section>
-    <p class="hours-note">Las horas regulares y dobles se suman como horas efectivamente registradas, sin multiplicar las dobles por dos. Los meses sin datos no se consideran registros reportados.</p>`;
-  ['hoursYear','hoursMonth','hoursType','hoursPerson'].forEach(id=>document.getElementById(id).addEventListener('change',updateHours));
-  document.getElementById('hoursExport').addEventListener('click',()=>{
-    const data=filteredHours();
-    const csv=['Colaborador;Año;Mes;Tipo;Horas',...data.map(x=>[x.name,x.year,HOURS_MONTHS[x.month-1],x.type,x.hours.toFixed(4).replace('.',',')].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';'))].join('\r\n');
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='horas_extra_filtradas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  });
-  updateHours();
-}
-function filteredHours(){
-  const y=document.getElementById('hoursYear').value,m=document.getElementById('hoursMonth').value,t=document.getElementById('hoursType').value,p=document.getElementById('hoursPerson').value;
-  return hoursRecords.filter(x=>(y==='all'||x.year===+y)&&(m==='all'||x.month===+m)&&(t==='all'||x.type===t)&&(p==='all'||x.name===p));
-}
-function hoursChart(id,type,labels,datasets,options={}){
-  if(typeof Chart==='undefined')return;
-  const chart=new Chart(document.getElementById(id),{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},...options}});
-  hoursCharts.push(chart);
-}
-function updateHours(){
-  hoursCharts.forEach(c=>c.destroy());hoursCharts=[];
-  const data=filteredHours(),sum=arr=>arr.reduce((a,x)=>a+x.hours,0);
-  const total=sum(data),regular=sum(data.filter(x=>x.type==='Regular')),double=sum(data.filter(x=>x.type==='Doble'));
-  const persons=new Set(data.filter(x=>x.hours>0).map(x=>x.name)).size;
-  const cards=[['Total horas',total,'h'],['Horas regulares',regular,'h'],['Horas dobles',double,'h'],['Colaboradores con horas',persons,'']];
-  document.getElementById('hoursKpis').innerHTML=cards.map(([label,n,unit])=>`<div class="card"><div class="label">${label}</div><div class="value">${unit?hoursFmt(n):n}${unit?' <small style="font-size:14px">h</small>':''}</div></div>`).join('');
-  const y=document.getElementById('hoursYear').value;
-  const months=y==='all'?[...new Set(data.map(x=>x.year+'-'+String(x.month).padStart(2,'0')))].sort():Array.from({length:12},(_,i)=>y+'-'+String(i+1).padStart(2,'0'));
-  const monthLabels=months.map(k=>{const [yr,mo]=k.split('-');return HOURS_MONTHS[+mo-1].slice(0,3)+' '+yr;});
-  hoursChart('hoursMonthly','bar',monthLabels,['Regular','Doble'].map((t,i)=>({label:t,data:months.map(k=>sum(data.filter(x=>x.type===t&&x.year+'-'+String(x.month).padStart(2,'0')===k))),backgroundColor:i?'#f3a65c':'#2f75b5'})),{scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}});
-  hoursChart('hoursTypes','doughnut',['Regular','Doble'],[{data:[regular,double],backgroundColor:['#2f75b5','#f3a65c']}]);
-  const byPerson=new Map();data.forEach(x=>byPerson.set(x.name,(byPerson.get(x.name)||0)+x.hours));
-  const top=[...byPerson].sort((a,b)=>b[1]-a[1]).slice(0,10);
-  hoursChart('hoursPeople','bar',top.map(x=>x[0]),[{label:'Horas',data:top.map(x=>x[1]),backgroundColor:'#25a18e'}],{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}});
-  const years=[...new Set(hoursRecords.map(x=>x.year))].sort();
-  hoursChart('hoursYears','bar',years.map(String),[{label:'Horas registradas',data:years.map(yr=>sum(data.filter(x=>x.year===yr))),backgroundColor:'#173b67'}],{scales:{y:{beginAtZero:true}}});
-  const names=[...new Set(data.map(x=>x.name))];
-  const table=names.map(name=>{const entries=data.filter(x=>x.name===name),r=sum(entries.filter(x=>x.type==='Regular')),d=sum(entries.filter(x=>x.type==='Doble'));return{name,r,d,total:r+d};}).sort((a,b)=>b.total-a.total);
-  document.getElementById('hoursRows').innerHTML=table.length?table.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${hoursFmt(x.r)}</td><td>${hoursFmt(x.d)}</td><td><b>${hoursFmt(x.total)}</b></td><td>${total?(x.total/total*100).toFixed(1):'0,0'}%</td></tr>`).join(''):'<tr><td colspan="5">No hay registros para los filtros seleccionados.</td></tr>';
-}
-
-
-document.getElementById('reload').addEventListener('click',loadHoursRemote);
-document.getElementById('excelInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{processHoursWorkbook(XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true}),f.name)}catch(err){status.textContent=err.message}});
-loadHoursRemote();
-</script></body></html>

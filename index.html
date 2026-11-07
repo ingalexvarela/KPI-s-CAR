@@ -223,7 +223,7 @@ th:nth-child(7){width:auto}
 
 .nav-bottom{
   display:grid;
-  grid-template-columns:repeat(7,1fr);
+  grid-template-columns:repeat(8,1fr);
   gap:9px;
   background:#fff;
   border:1px solid var(--border);
@@ -240,6 +240,14 @@ th:nth-child(7){width:auto}
   padding:12px 8px;
   font-weight:800;
   cursor:pointer;
+}
+
+.role-btn[href]{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  text-align:center;
 }
 
 .role-btn.active{
@@ -340,6 +348,10 @@ th:nth-child(7){width:auto}
     <button class="role-btn" data-role="facturacion">
       Facturación
     </button>
+
+    <a class="role-btn" href="horas_extra.html">
+      Horas Extra
+    </a>
 
   </nav>
 
